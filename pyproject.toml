@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "msr"
+version = "0.1.0"
+description = "A CLI tool to measure remote web pages and domains"
+authors = ["synek <rory@rory.bio>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+msr = "msr.cli:msr"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

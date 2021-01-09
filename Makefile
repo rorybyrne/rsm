@@ -2,4 +2,5 @@
 
 test:
 	@echo "Running tests..."
-	./test.sh
+	tox
+	#./test.sh

@@ -4,8 +4,8 @@
 """
 from typing import List
 
-from msr.persist.exceptions import StorageAccessException
-from msr.persist.registry.FileRegistry import FileRegistry
+from msr.storage.exceptions import StorageAccessException
+from msr.storage.url.FileRegistry import FileRegistry
 from msr.util.log import Logger
 
 

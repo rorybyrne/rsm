@@ -11,13 +11,13 @@ from urllib.parse import urlparse
 class URL:
     href: str
     domain: str = field(init=False)
+    path: str = field(init=False)
 
     def __post_init__(self):
         self._validate_href(self.href)
-        domain = urlparse(self.href).netloc
-        if not domain:
-            raise ValueError(f"Invalid URL: {self.href}")
-        self.domain = domain
+        url_components = urlparse(self.href)
+        self.domain = url_components.netloc
+        self.path = url_components.path or '/'
 
     @staticmethod
     def _validate_href(href: str):
@@ -26,20 +26,21 @@ class URL:
             raise ValueError(f"Invalid URL: {href}")
 
 
-T = TypeVar('T', int, float)
+MT = TypeVar('MT', int, float)  # MeasurementType
 
 
 @dataclass
-class Measurement(Generic[T]):
-    value: T
+class Measurement(Generic[MT]):
+    value: MT
+    title: str
 
 
 @dataclass
-class MeasuredUrl(Generic[T]):
+class MeasuredUrl(Generic[MT]):
     url: URL
-    measurement: Measurement[T]
+    measurement: Measurement[MT]
 
 
 @dataclass
-class Result(Generic[T]):
-    data: List[MeasuredUrl[T]]
+class Result(Generic[MT]):
+    data: List[MeasuredUrl[MT]]

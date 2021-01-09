@@ -5,6 +5,7 @@
 from typing import List
 
 from msr.model import URL, Result, MeasuredUrl, Measurement
+from msr.sensor.body_size_sensor import BodySizeSensor
 from msr.util.log import Logger
 
 
@@ -15,7 +16,9 @@ class MeasurementService(Logger):
         super().__init__()
 
     def measure_size(self, urls: List[URL]) -> Result[float]:
-        result = [MeasuredUrl(url, Measurement(1.3)) for url in urls]
+        """Measure each URL with the BodySizeSensor"""
+        sensor = BodySizeSensor()
+        result = [MeasuredUrl(url, sensor.measure(url)) for url in urls]
 
         return Result(result)
 

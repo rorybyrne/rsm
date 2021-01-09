@@ -3,6 +3,7 @@
 @author Rory Byrne <rory@rory.bio>
 """
 from dataclasses import dataclass, field
+from typing import TypeVar, Generic, List
 from urllib.parse import urlparse
 
 
@@ -23,3 +24,22 @@ class URL:
         parsed_url = urlparse(href)
         if not parsed_url.netloc and parsed_url.scheme:
             raise ValueError(f"Invalid URL: {href}")
+
+
+T = TypeVar('T', int, float)
+
+
+@dataclass
+class Measurement(Generic[T]):
+    value: T
+
+
+@dataclass
+class MeasuredUrl(Generic[T]):
+    url: URL
+    measurement: Measurement[T]
+
+
+@dataclass
+class Result(Generic[T]):
+    data: List[MeasuredUrl[T]]

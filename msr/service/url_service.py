@@ -4,8 +4,9 @@
 """
 from typing import List
 
+from msr.model import URL
 from msr.storage.exceptions import StorageAccessException
-from msr.storage.url.FileRegistry import FileRegistry
+from msr.storage.url import FileUrlStorage
 from msr.util.log import Logger
 
 
@@ -22,9 +23,9 @@ class UrlService(Logger):
 
     def __init__(self):
         super().__init__()
-        self.registry = FileRegistry()  # Later we should inject this via dependency injection
+        self.registry = FileUrlStorage()  # Later we should inject this via dependency injection
 
-    def store_url(self, url: str) -> None:
+    def store_url(self, url: URL) -> None:
         """Store the given URL in the registry"""
         try:
             self.registry.save(url)
@@ -35,7 +36,7 @@ class UrlService(Logger):
             self.log.error(e)
             raise RegistryException(e)
 
-    def fetch_urls(self) -> List[str]:
+    def fetch_urls(self) -> List[URL]:
         """Fetch all of the URLs from the registry"""
         try:
             return self.registry.get_all()

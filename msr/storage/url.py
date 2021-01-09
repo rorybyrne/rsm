@@ -15,14 +15,19 @@ from msr.util.log import Logger
 StoredUrl = Dict[str, str]
 
 
-class UrlStorage(ABC):
+class UrlStorage(ABC, Logger):
     """An abstraction for storing and retrieving URLs"""
 
     def save(self, url: URL) -> None:
         if not self._storage_exists():
-            self._create_storage()
+            raise RegistryNotFoundException()
 
-        self._save(url)
+        try:
+            self._save(url)
+        except Exception as e:
+            #  @todo - better error handling here
+            self.log.error(e)
+            raise StorageAccessException()
 
     @abstractmethod
     def get_all(self) -> List[URL]:
@@ -45,14 +50,17 @@ class UrlStorage(ABC):
         raise NotImplementedError()
 
 
-class FileUrlStorage(UrlStorage, Logger):
+class FileUrlStorage(UrlStorage):
     """URL storage backed by a file"""
     DATA_HOME = os.environ.get('XDG_DATA_HOME', '.')  # Use the current dir if no XDG configuration is found
 
-    def __init__(self, filename: str = 'registry'):
+    def __init__(self):
         super().__init__()
+        # @todo - Add dependency injection
+        filename = os.environ.get('MSR_REGISTRY_FILE', 'registry')
         self.file = os.path.join(self.DATA_HOME, f'{filename}.json')
-        self.log.debug(f'Using {self.file} as registry')
+        if not self._storage_exists():
+            self._create_storage()
 
     def get_all(self) -> List[URL]:
         """Load all URLs from the file, then parse them into URL objects and return
@@ -85,7 +93,6 @@ class FileUrlStorage(UrlStorage, Logger):
                 storage_data: List[StoredUrl] = json.load(file)
                 return storage_data
         except Exception as e:
-            self.log.error(e)
             raise StorageAccessException("Could not load registry data from file")
 
     def _storage_exists(self) -> bool:
@@ -99,8 +106,16 @@ class FileUrlStorage(UrlStorage, Logger):
 
     def _save(self, url: URL):
         """Load the data from file, add the new URL, and then save"""
-        stored_data: List[StoredUrl] = self._load_file()
-        stored_data.append({'href': url.href, 'domain': url.domain})
+        urls: List[StoredUrl] = self._load_file()
+        for stored_url in urls:
+            if stored_url['href'] == url.href:
+                # don't add duplicates
+                return
+
+        urls.append({'href': url.href, 'domain': url.domain})
+
+        with open(self.file, 'w') as file:
+            file.write(json.dumps(urls))
 
     def clear(self):
         os.remove(self.file)

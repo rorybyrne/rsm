@@ -25,10 +25,11 @@ class UrlService(Logger):
         super().__init__()
         self.registry = FileUrlStorage()  # Later we should inject this via dependency injection
 
-    def store_url(self, url: URL) -> None:
+    async def store_url(self, url: URL) -> None:
         """Store the given URL in the registry"""
         try:
             self.registry.save(url)
+            print("Stored.")
         except StorageAccessException as e:
             self.log.error(e)
             raise RegistryException("Could not save URL in the registry.")

@@ -16,10 +16,6 @@ class BodySizeSensor(Sensor, Logger):
     dimension = 'Body Size'
     unit = 'bytes'
 
-    def __init__(self, session: ClientSession = None):
-        super().__init__()
-        self.session = session
-
     async def measure(self, url: URL):
         """Perform a GET request and measure the byte size of its content
 
@@ -29,6 +25,9 @@ class BodySizeSensor(Sensor, Logger):
         Note:
             I haven't used AIOHTTP before, so I'm not familiar with its API.
         """
+        if not self.session:
+            raise ValueError("Sensor has no session for performing web requests.")
+
         try:
             resp = await self.session.get(url.href)
 

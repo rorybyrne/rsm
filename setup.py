@@ -5,7 +5,9 @@ setuptools.setup(
     version='0.1.0',
     py_modules=['msr'],
     install_requires=[
-        'Click'
+        'Click',
+        'aiohttp',
+        'rich'
     ],
     entry_points='''
         [console_scripts]

@@ -1,6 +1,13 @@
 .PHONY: test
 
-test:
+unit-test:
 	@echo "Running tests..."
+	pip install tox
 	tox
-	#./test.sh
+
+test:
+	./test.sh
+
+clean:
+	rm -rf tmp
+	rm -rf venv

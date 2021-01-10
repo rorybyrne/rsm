@@ -23,7 +23,7 @@ def register(url: str):
     try:
         url = URL(url)
         print(f"Storing {url.href}")
-        asyncio.run(url_service.store_url(url))
+        url_service.store_url(url)
     except ValueError as e:
-        print("Invalid URL.")
+        print(e)
         exit(1)

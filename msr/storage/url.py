@@ -57,7 +57,7 @@ class FileUrlStorage(UrlStorage):
     def __init__(self):
         super().__init__()
         # @todo - Add dependency injection
-        filename = os.environ.get('MSR_REGISTRY_FILE', 'registry')
+        filename = os.environ.get('MSR_REGISTRY_FILE', 'tmp/registry')
         self.file = os.path.join(self.DATA_HOME, f'{filename}.json')
         if not self._storage_exists():
             self._create_storage()
@@ -101,6 +101,9 @@ class FileUrlStorage(UrlStorage):
 
     def _create_storage(self):
         """Create an empty file"""
+        if not os.path.exists('./tmp'):
+            os.mkdir('tmp')
+
         with open(self.file, 'a') as file:
             file.write('[]')  # An empty JSON array
 

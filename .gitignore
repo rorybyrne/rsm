@@ -132,3 +132,4 @@ registry.json
 test_registry.json
 foo_registry.json
 temp.txt
+tmp/

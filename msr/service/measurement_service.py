@@ -32,7 +32,7 @@ class MeasurementService(Logger):
         """Generates and executes a set of asynchronous measurement tasks"""
         urls = self.url_service.fetch_urls()
 
-        temp_filename = f'{sensor.dimension}_temp.txt'
+        temp_filename = f'./tmp/{sensor.dimension}_temp.txt'
         self._create_temp_file(temp_filename)
 
         with self.display_service.live_table() as live:

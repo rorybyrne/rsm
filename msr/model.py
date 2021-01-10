@@ -3,7 +3,7 @@
 @author Rory Byrne <rory@rory.bio>
 """
 from dataclasses import dataclass, field
-from typing import TypeVar, Generic, List, Dict
+from typing import TypeVar, Generic, List, Dict, Union
 from urllib.parse import urlparse
 
 
@@ -49,7 +49,30 @@ class MeasuredUrl:
     def from_dict(d: Dict[str, Dict]):
         return MeasuredUrl(URL.from_dict(d['url']), Measurement.from_dict(d['measurement']))
 
+    def __lt__(self, other: 'MeasuredUrl'):
+        return self.measurement.value < other.measurement.value
+
+    def row_data(self, unit: str):
+        return self.url.domain, self.url.path, f'{self.measurement.value:0.4f} {unit}'
+
 
 @dataclass
-class Result:
-    data: List[MeasuredUrl]
+class MeasuredDomain:
+    domain: str
+    measurement: Measurement
+
+    def row_data(self, unit: str):
+        return self.domain, f'{self.measurement.value:0.4f} {unit}'
+
+    def __lt__(self, other: 'MeasuredDomain'):
+        return self.measurement.value < other.measurement.value
+
+
+MeasuredResource = Union[MeasuredUrl, MeasuredDomain]
+
+MT = TypeVar('MT', MeasuredDomain, MeasuredUrl)
+
+
+@dataclass
+class Result(Generic[MT]):
+    data: List[MT]

@@ -17,20 +17,17 @@ class ResponseTimeSensor(Sensor, Logger):
     dimension = 'Response Time'
     unit = 'ms'
 
-    def __init__(self, session: ClientSession = None):
-        super().__init__()
-        self.session = session
-
     async def measure(self, url: URL):
         """Perform a GET request and measure the response time"""
+        if not self.session:
+            raise ValueError("Sensor has no session for performing web requests.")
+
         try:
-            print(f'Sensing {url.href}')
             tick = time.perf_counter()
             await self.session.get(url.href)
             tock = time.perf_counter()
 
             delta_ms = (tock - tick)*1000
-            # print(f'{url.href} took {delta_ms} ms')
 
             return Measurement(float(delta_ms), self.dimension)
         except Exception as e:

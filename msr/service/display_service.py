@@ -3,12 +3,14 @@
 @author Rory Byrne <rory@rory.bio>
 """
 from contextlib import contextmanager
-from typing import ContextManager
+from typing import ContextManager, List, Tuple, Dict, Any
 
 from rich.live import Live
 from rich.table import Table
 
+from msr.aggregators import Aggregator, AverageByDomain
 from msr.model import Result
+from msr.sensor.base import Sensor
 from msr.util.log import Logger
 
 
@@ -19,19 +21,14 @@ class DisplayService(Logger):
         super().__init__()
 
     @staticmethod
-    def build_table(result: Result, dimension: str, unit: str):
+    def build_table(columns: List[Dict[str, Any]], rows: List[Tuple]):
         """Construct a table for the given result"""
         table = Table(show_header=True, header_style="bold magenta")
-        table.add_column("Domain", style="dim", width=12)
-        table.add_column("Path", width=32)
-        table.add_column(dimension, justify="right")
+        for col in columns:
+            table.add_column(**col)
 
-        for measured_url in result.data:
-            table.add_row(
-                measured_url.url.domain,
-                measured_url.url.path,
-                f'{measured_url.measurement.value:0.4f} {unit}'
-            )
+        for row in rows:
+            table.add_row(*row)
 
         return table
 
@@ -44,4 +41,27 @@ class DisplayService(Logger):
             yield live_table
         finally:
             live_table.stop()
+
+    @staticmethod
+    def build_columns(aggregator: Aggregator, sensor: Sensor) -> List[Dict[str, Any]]:
+        columns = [
+            {
+                'header': 'Domain',
+                'style': 'dim',
+                'width': 24
+            },
+        ]
+
+        if not isinstance(aggregator, AverageByDomain):
+            columns.append({
+                'header': 'Path',
+                'width': 32
+            })
+
+        columns.append({
+            'header': sensor.dimension,
+            'justify': 'right'
+        })
+
+        return columns
 

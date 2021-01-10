@@ -2,6 +2,8 @@
 
 @author Rory Byrne <rory@rory.bio>
 """
+import asyncio
+
 import click
 
 from msr.model import URL
@@ -20,8 +22,8 @@ def register(url: str):
 
     try:
         url = URL(url)
-        url_service.store_url(url)
-        print("URL stored.")
+        print(f"Storing {url.href}")
+        asyncio.run(url_service.store_url(url))
     except ValueError as e:
         print("Invalid URL.")
         exit(1)

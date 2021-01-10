@@ -3,14 +3,16 @@
 @author Rory Byrne <rory@rory.bio>
 """
 from abc import ABC, abstractmethod
-from typing import Generic
 
-from msr.model import URL, MT, Measurement
+from msr.model import URL, Measurement
 from msr.util.log import Logger
 
 
-class Sensor(ABC, Logger, Generic[MT]):
+class Sensor(ABC, Logger):
+
+    dimension: str
+    unit: str
 
     @abstractmethod
-    def measure(self, url: URL) -> Measurement[MT]:
+    async def measure(self, url: URL) -> Measurement:
         raise NotImplementedError()

@@ -3,7 +3,7 @@
 @author Rory Byrne <rory@rory.bio>
 """
 from dataclasses import dataclass, field
-from typing import TypeVar, Generic, List
+from typing import TypeVar, Generic, List, Dict
 from urllib.parse import urlparse
 
 
@@ -25,22 +25,31 @@ class URL:
         if not parsed_url.netloc and parsed_url.scheme:
             raise ValueError(f"Invalid URL: {href}")
 
-
-MT = TypeVar('MT', int, float)  # MeasurementType
-
-
-@dataclass
-class Measurement(Generic[MT]):
-    value: MT
-    title: str
+    @staticmethod
+    def from_dict(d: Dict[str, str]):
+        return URL(d['href'])
 
 
 @dataclass
-class MeasuredUrl(Generic[MT]):
+class Measurement:
+    value: float
+    dimension: str
+
+    @staticmethod
+    def from_dict(d: Dict[str, str]):
+        return Measurement(float(d['value']), d['dimension'])
+
+
+@dataclass
+class MeasuredUrl:
     url: URL
-    measurement: Measurement[MT]
+    measurement: Measurement
+
+    @staticmethod
+    def from_dict(d: Dict[str, Dict]):
+        return MeasuredUrl(URL.from_dict(d['url']), Measurement.from_dict(d['measurement']))
 
 
 @dataclass
-class Result(Generic[MT]):
-    data: List[MeasuredUrl[MT]]
+class Result:
+    data: List[MeasuredUrl]
